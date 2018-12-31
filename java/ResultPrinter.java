@@ -6,7 +6,7 @@ import java.util.List;
 // javac ResultPrinter.java & java ResultPrinter
 public class ResultPrinter {
         public ResultPrinter(int attackSeconds,String targetUrl,CompletionService<List<String> > DoneRequestQueue){
-                System.out.println("Attacknig the url:");
+                System.out.println("Target URL:");
                 System.out.println(targetUrl);
                 System.out.println("for "+attackSeconds+" seconds...");
         }

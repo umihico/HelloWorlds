@@ -9,8 +9,9 @@ public class Main {
                 Integer attackSeconds=Integer.parseInt(args[0]);
                 String targetUrl=args[1];
                 HttpParralelExecutor httpParralelExecutor = new HttpParralelExecutor(attackSeconds,targetUrl);
-                ResultPrinter resultPrinter=new ResultPrinter(attackSeconds,targetUrl,httpParralelExecutor.DoneRequestQueue);
+                ResultPrinter resultPrinter=new ResultPrinter(attackSeconds,targetUrl,httpParralelExecutor.getDoneRequestQueue());
                 httpParralelExecutor.startInBackground();
                 resultPrinter.printTillEnd();
+                System.out.println("Main -fin-");
         }
 }
