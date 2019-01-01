@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.List;
 // javac ResultPrinter.java & java ResultPrinter
 public class ResultPrinter {
-        public ResultPrinter(int attackSeconds,String targetUrl,CompletionService<List<String> > DoneRequestQueue){
+        public ResultPrinter(int attackSeconds,String targetUrl,CompletionService<String> DoneRequestQueue){
                 System.out.println("Target URL:");
                 System.out.println(targetUrl);
                 System.out.println("for "+attackSeconds+" seconds...");

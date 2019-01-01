@@ -3,7 +3,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.List;
-// javac Main.java & java Main
+// javac Main.java & java Main 10 https://github.com/
 public class Main {
         public static void main(String[] args) throws Exception {
                 Integer attackSeconds=Integer.parseInt(args[0]);

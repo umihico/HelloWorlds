@@ -13,22 +13,25 @@ import java.util.concurrent.Callable;
 public class HttpParralelExecutorBG implements Callable<Long> {
         private Integer attackSeconds;
         private String targetUrl;
-        private CompletionService<List<String> > jobQueue;
+        private CompletionService<String> jobQueue;
         private BlockingQueue completionInsideQueue;
-        public static void main(String... args){
-
-        }
-
-        public HttpParralelExecutorBG(int attackSeconds,String targetUrl,CompletionService<List<String> > jobQueue,BlockingQueue completionInsideQueue) {
+        private ExecutorService executorService;
+        public HttpParralelExecutorBG(int attackSeconds,String targetUrl,CompletionService<String> jobQueue,BlockingQueue completionInsideQueue,ExecutorService executorService) {
                 this.attackSeconds=attackSeconds;
                 this.targetUrl=targetUrl;
                 this.jobQueue=jobQueue;
                 this.completionInsideQueue=completionInsideQueue;
+                this.executorService=executorService;
         }
         @Override
         public Long call() throws Exception {
-                Thread.sleep(5000);
-                System.out.println("call3");
+                // Thread.sleep(5000);
+
+                for(int i = 0; i < 3; i++) {
+                        this.jobQueue.submit(new HttpRequest(this.targetUrl));
+                }
+                this.executorService.shutdown();
+                System.out.println("call4");
                 return 1l;
         }
 }
