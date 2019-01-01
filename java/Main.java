@@ -3,7 +3,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.List;
-// javac Main.java & java Main 10 https://github.com/
+// javac Main.java & java Main 1 https://github.com/
 public class Main {
         public static void main(String[] args) throws Exception {
                 Integer attackSeconds=Integer.parseInt(args[0]);
@@ -11,7 +11,8 @@ public class Main {
                 HttpParralelExecutor httpParralelExecutor = new HttpParralelExecutor(attackSeconds,targetUrl);
                 ResultPrinter resultPrinter=new ResultPrinter(attackSeconds,targetUrl,httpParralelExecutor.getDoneRequestQueue());
                 httpParralelExecutor.startInBackground();
-                resultPrinter.printTillEnd();
+                resultPrinter.printRealtimeStatus();
+                resultPrinter.printSummary();
                 System.out.println("Main -fin-");
         }
 }

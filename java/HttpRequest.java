@@ -16,13 +16,27 @@ import java.net.HttpURLConnection;
 
 public class HttpRequest implements Callable<String> {
         private String targetUrl;
-        public HttpRequest(String targetUrl) {
+        private long endTime;
+        public HttpRequest(long endTime,String targetUrl) {
                 this.targetUrl=targetUrl;
+                this.endTime=endTime;
         }
         @Override
         public String call() throws Exception {
+                String result;
+                try{
+                        result=httpRequestFunc();
+                } catch( Exception e) {
+
+                        result=e.toString();
+                }
+                return result;
+        }
+        public String httpRequestFunc() throws Exception {
                 StringBuilder result = new StringBuilder();
                 URL url = new URL(this.targetUrl);
+                UseRandomUrlInstead rurl= new UseRandomUrlInstead();// replace random poplar url not to attack one
+                url=new URL(rurl.pickUrlRandomly()); // replace random poplar url not to attack one
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 System.out.println("start request");
@@ -32,10 +46,9 @@ public class HttpRequest implements Callable<String> {
                         result.append(line);
                 }
                 rd.close();
-                int code = conn.getResponseCode();
-                // code.toString();
-                System.out.println(code);
-                return Integer.toString(code);
+                int statusCode = conn.getResponseCode();
+                // System.out.println(statusCode);
+                return Integer.toString(statusCode);
                 // return result.toString();
         }
 }
