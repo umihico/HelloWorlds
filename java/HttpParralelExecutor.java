@@ -16,7 +16,7 @@ public class HttpParralelExecutor {
         private BlockingQueue jobQueue;
         private Integer attackSeconds;
         private String targetUrl;
-        private ExecutorService executorService;
+        private ExecutorService backgroundExecutorService;
         private long jobQueueMaxSize;
 
         public HttpParralelExecutor(int attackSeconds,String targetUrl) {
@@ -28,18 +28,16 @@ public class HttpParralelExecutor {
                 this.jobQueueMaxSize=vcpu*2;
                 int threadNum= vcpu*100;
                 this.jobQueue=new LinkedBlockingQueue();
-                this.executorService =new ThreadPoolExecutor(threadNum, threadNum,
-                                                             60L, TimeUnit.SECONDS,
-                                                             this.jobQueue,new ThreadFactory() {
+                this.backgroundExecutorService =new ThreadPoolExecutor(threadNum, threadNum,
+                                                                       60L, TimeUnit.SECONDS,
+                                                                       this.jobQueue,new ThreadFactory() {
                         public Thread newThread(Runnable r) {
                                 Thread t = Executors.defaultThreadFactory().newThread(r);
                                 t.setDaemon(true);
                                 return t;
                         }
                 });
-                // new LinkedBlockingQueue(1));
-                // ExecutorService executorService =Executors.newSingleThreadExecutor();
-                this.doneRequestQueue=new ExecutorCompletionService<String>(executorService);
+                this.doneRequestQueue=new ExecutorCompletionService<String>(backgroundExecutorService);
         }
         public CompletionService<String> getDoneRequestQueue(){
                 return this.doneRequestQueue;
@@ -55,19 +53,19 @@ public class HttpParralelExecutor {
                                         // System.out.println(System.currentTimeMillis()-endTime);
                                         if (jobQueue.size()<jobQueueMaxSize) {
                                                 i++;
-                                                System.out.println("true"+i+" queue size:"+jobQueue.size());
-                                                doneRequestQueue.submit(new HttpRequest(endTime,targetUrl,jobQueue));
-                                                System.out.println("submitted"+i);
+                                                // System.out.println("true"+i+" queue size:"+jobQueue.size());
+                                                doneRequestQueue.submit(new HttpRequest(targetUrl));
+                                                // System.out.println("submitted"+i);
                                         } else {
                                                 Thread.sleep(10);// doneRequestQueue.submit cause deadlock if inside queue has limitation when  without this.
                                         }
                                 } else {
-                                        System.out.println("break"+i);
+                                        // System.out.println("break"+i);
                                         break;
                                 }
                         }
-                        System.out.println("breaked");
-                        executorService.shutdown();
+                        // System.out.println("breaked");
+                        backgroundExecutorService.shutdown();
                         return 1l;
                 }
         }

@@ -16,26 +16,18 @@ import java.net.HttpURLConnection;
 
 public class HttpRequest implements Callable<String> {
         private String targetUrl;
-        private long endTime;
-        private BlockingQueue jobQueue;
-        public HttpRequest(long endTime,String targetUrl,BlockingQueue jobQueue) {
+        public HttpRequest(String targetUrl) {
                 this.targetUrl=targetUrl;
-                this.endTime=endTime;
-                this.jobQueue=jobQueue;
         }
         @Override
         public String call() throws Exception {
-                System.out.println("received."+" queue size:"+jobQueue.size());
+                System.out.println("received.");
                 String result;
-                if (System.currentTimeMillis()<endTime) {
-                        try{
-                                result=httpRequestFunc();
-                        } catch( Exception e) {
+                try{
+                        result=httpRequestFunc();
+                } catch( Exception e) {
 
-                                result=e.toString();
-                        }
-                } else{
-                        result="timeover";
+                        result=e.toString();
                 }
                 return result;
         }
