@@ -17,29 +17,36 @@ import java.net.HttpURLConnection;
 public class HttpRequest implements Callable<String> {
         private String targetUrl;
         private long endTime;
-        public HttpRequest(long endTime,String targetUrl) {
+        private BlockingQueue jobQueue;
+        public HttpRequest(long endTime,String targetUrl,BlockingQueue jobQueue) {
                 this.targetUrl=targetUrl;
                 this.endTime=endTime;
+                this.jobQueue=jobQueue;
         }
         @Override
         public String call() throws Exception {
+                System.out.println("received."+" queue size:"+jobQueue.size());
                 String result;
-                try{
-                        result=httpRequestFunc();
-                } catch( Exception e) {
+                if (System.currentTimeMillis()<endTime) {
+                        try{
+                                result=httpRequestFunc();
+                        } catch( Exception e) {
 
-                        result=e.toString();
+                                result=e.toString();
+                        }
+                } else{
+                        result="timeover";
                 }
                 return result;
         }
         public String httpRequestFunc() throws Exception {
                 StringBuilder result = new StringBuilder();
                 URL url = new URL(this.targetUrl);
-                UseRandomUrlInstead rurl= new UseRandomUrlInstead();// replace random poplar url not to attack one
-                url=new URL(rurl.pickUrlRandomly()); // replace random poplar url not to attack one
+                RandomUrlGenerator rurl= new RandomUrlGenerator();// replace random poplar url not to attack one
+                url=new URL(rurl.genUrlRandomly()); // replace random poplar url not to attack one
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
-                System.out.println("start request");
+                // System.out.println("start request");
                 BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line;
                 while ((line = rd.readLine()) != null) {
