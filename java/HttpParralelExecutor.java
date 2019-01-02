@@ -22,9 +22,10 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Future;
+import java.util.HashMap;
 // javac HttpParralelExecutor.java & java HttpParralelExecutor
 public class HttpParralelExecutor {
-        private CompletionService<String> doneRequestQueue;
+        private CompletionService<HashMap<String,String> > doneRequestQueue;
         private BlockingQueue jobQueue;
         private Integer attackSeconds;
         private String targetUrl;
@@ -35,7 +36,7 @@ public class HttpParralelExecutor {
                 this.targetUrl=targetUrl;
                 this.jobQueue=new LinkedBlockingQueue();
                 this.backgroundExecutorService =genThreadPoolExecutor();
-                this.doneRequestQueue=new ExecutorCompletionService<String>(backgroundExecutorService);
+                this.doneRequestQueue=new ExecutorCompletionService<HashMap<String,String> >(backgroundExecutorService);
         }
         public ExecutorService genThreadPoolExecutor(){
                 int vcpu = Runtime.getRuntime().availableProcessors();
@@ -50,7 +51,7 @@ public class HttpParralelExecutor {
                         }
                 });
         }
-        public CompletionService<String> getDoneRequestQueue(){
+        public CompletionService<HashMap<String,String> > getDoneRequestQueue(){
                 return this.doneRequestQueue;
         }
 

@@ -11,11 +11,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.Queue;
+import java.util.HashMap;
 // javac ResultPrinter.java & java ResultPrinter
 public class ResultPrinter {
-        private CompletionService<String> doneRequestQueue;
+        private CompletionService<HashMap<String,String> > doneRequestQueue;
         private long endTime;
-        public ResultPrinter(int attackSeconds,String targetUrl,CompletionService<String> doneRequestQueue){
+        public ResultPrinter(int attackSeconds,String targetUrl,CompletionService<HashMap<String,String> > doneRequestQueue){
                 System.out.println("Target URL:");
                 System.out.println(targetUrl);
                 this.endTime = System.currentTimeMillis()+(attackSeconds*1000);
@@ -28,17 +29,17 @@ public class ResultPrinter {
                 long i = 0l;
                 while (true) {
                         i++;
-                        // Future<String> future = this.doneRequestQueue.poll(10,TimeUnit.SECONDS);
-                        Future<String> future = this.doneRequestQueue.take();
+                        // Future<HashMap<String,String>> future = this.doneRequestQueue.poll(10,TimeUnit.SECONDS);
+                        Future<HashMap<String,String> > future = this.doneRequestQueue.take();
                         if (System.currentTimeMillis()>this.endTime) {
                                 System.out.println("Printer break.");
                                 break;
                         }
-                        String newResult = future.get();
+                        HashMap<String,String> newResult = future.get();
                         printRealtimeStatusMain(newResult,i);
                 }
         }
-        public void printRealtimeStatusMain(String newResult,long i){
+        public void printRealtimeStatusMain(HashMap<String,String> newResult,long i){
                 System.out.println("resultPrinter "+i+" :"+newResult);
 
         }
