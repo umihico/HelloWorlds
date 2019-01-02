@@ -1,19 +1,20 @@
 import java.util.Random;
 // javac RandomUrlGenerator.java & java RandomUrlGenerator
 public class RandomUrlGenerator {
-        static String rawHosts="google.co.jp,yahoo.co.jp,google.com,youtube.com,amazon.co.jp,twitter.com,docomo.ne.jp,rakuten.co.jp,fc2.com,dmm.co.jp,facebook.com,wikipedia.org,news.yahoo.co.jp,nicovideo.jp,pornhub.com,xvideos.com,livedoor.jp,pixiv.net,auone.jp,ameblo.jp,syosetu.com,instagram.com,eroterest.net,goo.ne.jp,livedoor.com,naver.jp,blog.jp,movie.eroterest.net,mbga.jp,kakaku.com,news.livedoor.com,shopping.yahoo.co.jp,ampproject.org,dmm.com,cityheaven.net,5ch.net,tabelog.com,dmkt-sp.jp,ameba.jp,line.me,cookpad.com,xbooks.to,gamewith.jp,xhamster.com,granbluefantasy.jp,zozo.jp,bakusai.com,jra.go.jp,cmoa.jp";
+        // https://en.wikipedia.org/wiki/List_of_most_popular_websites
+        static String baseHosts="google.com,youtube.com,facebook.com,baidu.com,wikipedia.org,reddit.com,yahoo.com,qq.com,taobao.com,google.co.in,amazon.com,tmall.com,twitter.com,sohu.com,instagram.com,vk.com,live.com,jd.com,sina.com.cn,weibo.com,yandex.ru,360.cn,google.co.jp,google.co.uk,list.tmall.com,google.ru,google.com.br,netflix.com,google.de,google.com.hk,pornhub.com,twitch.tv,google.fr,linkedin.com,yahoo.co.jp,t.co,csdn.net,microsoft.com,bing.com,office.com,ebay.com,alipay.com,xvideos.com,google.it,google.ca,mail.ru,ok.ru,google.es,pages.tmall.com,msn.com,google.com.tr,google.com.au,whatsapp.com,spotify.com,google.pl,google.co.id,xhamster.com,google.com.ar,xnxx.com,google.co.th,Naver.com,sogou.com,samsung.com,accuweather.com,goo.gl,sm.cn,googleweblight.com";
         public static void main(String[] args){
+                // test
                 System.out.println(genUrlRandomly());
         }
         public static String genUrlRandomly() {
                 String urlString="https://"+genHostRandomly();
-                System.out.println(urlString);
+                // System.out.println(urlString);
                 return urlString;
         }
         public static String genHostRandomly() {
-                String[] splitedUrls=rawHosts.split(",",0);
-                Random rnd = new Random();
-                int randomedInt = rnd.nextInt(splitedUrls.length);
-                return splitedUrls[randomedInt];
+                String[] splitedHosts=baseHosts.split(",",0);
+                int randomIndex = new Random().nextInt(splitedHosts.length);
+                return splitedHosts[randomIndex];
         }
 }

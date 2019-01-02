@@ -21,7 +21,7 @@ public class HttpRequest implements Callable<String> {
         }
         @Override
         public String call() throws Exception {
-                System.out.println("received.");
+                // System.out.println("received.");
                 String result;
                 try{
                         result=httpRequestFunc();

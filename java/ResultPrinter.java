@@ -26,7 +26,6 @@ public class ResultPrinter {
         public void printRealtimeStatus() throws Exception {
 
                 long i = 0l;
-
                 while (true) {
                         i++;
                         // Future<String> future = this.doneRequestQueue.poll(10,TimeUnit.SECONDS);
@@ -43,8 +42,9 @@ public class ResultPrinter {
                 System.out.println("resultPrinter "+i+" :"+newResult);
 
         }
-        public void printSummary(){
+        public void printSummary(long requestedNum){
                 System.out.println("resultPrinter printSummary");
+                System.out.println(requestedNum);
 
         }
 }
