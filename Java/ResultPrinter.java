@@ -12,40 +12,108 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.Queue;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.Map.Entry;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Comparator;
 // javac ResultPrinter.java & java ResultPrinter
 public class ResultPrinter {
         private CompletionService<HashMap<String,String> > doneRequestQueue;
         private long endTime;
-        public ResultPrinter(int attackSeconds,String targetUrl,CompletionService<HashMap<String,String> > doneRequestQueue){
+        private long startTime;
+        private HashMap<String,HashMap<String,Long> > statusCodeCountDict;
+        public ResultPrinter(long attackSeconds,String targetUrl,CompletionService<HashMap<String,String> > doneRequestQueue){
                 System.out.println("Target URL:");
                 System.out.println(targetUrl);
-                this.endTime = System.currentTimeMillis()+(attackSeconds*1000);
+                this.startTime = System.currentTimeMillis();
+                this.endTime = this.startTime+(attackSeconds*1000);
                 System.out.println("Attacking for '"+attackSeconds+"' seconds...");
                 this.doneRequestQueue=doneRequestQueue;
 
         }
         public void printRealtimeStatus() throws Exception {
-
+                this.statusCodeCountDict= new HashMap<String,HashMap<String,Long> >();
                 long i = 0l;
                 while (true) {
+                        if (System.currentTimeMillis()>this.endTime) {
+                                // System.out.println("Printer break.");
+                                break;
+                        }
                         i++;
                         // Future<HashMap<String,String>> future = this.doneRequestQueue.poll(10,TimeUnit.SECONDS);
                         Future<HashMap<String,String> > future = this.doneRequestQueue.take();
-                        if (System.currentTimeMillis()>this.endTime) {
-                                System.out.println("Printer break.");
-                                break;
-                        }
                         HashMap<String,String> newResult = future.get();
-                        printRealtimeStatusMain(newResult,i);
+                        String statusCode=newResult.get("statusCode");
+                        String detail=newResult.get("detail");
+                        incrementSameStatusCount(statusCode,detail);
+                        printRealtimeStatusFunc(statusCode,detail,i);
                 }
         }
-        public void printRealtimeStatusMain(HashMap<String,String> newResult,long i){
-                System.out.println("resultPrinter "+i+" :"+newResult);
+        public void incrementSameStatusCount(String statusCode, String detail){
+                if (statusCodeCountDict.containsKey(statusCode)) {
+                        HashMap<String,Long> detailsDict= statusCodeCountDict.get(statusCode);
+                        if (detailsDict.containsKey(detail)) {
+                                detailsDict.put(detail,detailsDict.get(detail)+1);
+                        } else {
+                                detailsDict.put(detail,1l);
+                        }
+                        detailsDict.put("sum",detailsDict.get("sum")+1);
+                } else {
+                        HashMap<String,Long> detailsDict= new HashMap<String,Long>();
+                        detailsDict.put(detail,1l);
+                        detailsDict.put("sum",1l);
+                        statusCodeCountDict.put(statusCode,detailsDict);
+                }
+
+        }
+        public void printRealtimeStatusFunc(String statusCode, String detail,long i){
+                // System.out.println("resultPrinter "+i+" :"+newResult);
+                System.out.print("\r");
+                System.out.print("passed "+(System.currentTimeMillis()-this.startTime)/1000 + " sec  ");
+                for (String key : statusCodeCountDict.keySet()) {
+                        System.out.print("'"+key+"':" +((HashMap)statusCodeCountDict.get( key)).get( "sum" )+"times  ");
+                        System.out.print(" ");
+                }
 
         }
         public void printSummary(long requestedNum){
-                System.out.println("resultPrinter printSummary");
-                System.out.println(requestedNum);
+                System.out.println("");// new line to escape carriage return line
+                System.out.println("---Summary---");
+                for (String key : statusCodeCountDict.keySet()) {
+                        HashMap<String,Long> detailsDict=statusCodeCountDict.get(key);
+                        Long totalTimes=detailsDict.get("sum");
+                        detailsDict.remove("sum");
+                        int keySize=detailsDict.keySet().size();
+                        System.out.println("----status code '" + key + "'  total'"+totalTimes+"' times  '"+ keySize+"' patterns body text----");
+                        Map<String, Long> sortedMap = detailsDict.entrySet().stream()
+                                                      .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                                                      .limit(3)
+                                                      .collect(Collectors.toMap(
+                                                                       Map.Entry::getKey, Map.Entry::getValue, (e1, e2)->e1, LinkedHashMap::new));
+                        for(Map.Entry<String, Long> entry : sortedMap.entrySet()) {
+                                System.out.println("-----status code '" + key + "'  frequent body text '"+ entry.getValue()+"' times-----");
+                                System.out.println("");
+                                System.out.println("'"+haedtailResponse(entry.getKey())+"'");
+                                System.out.println("");
 
+                        }
+
+                }
+                System.out.println("---Summary end---");
+
+        }
+        public String haedtailResponse(String responseText){
+                if (responseText.length()<=800) {
+                        return responseText;
+                } else {
+                        return haedResponse(responseText)+"///////////////////"+tailResponse(responseText);
+                }
+        }
+        public String haedResponse(String responseText){
+                return responseText.substring(0,Math.min(responseText.length(), 400));
+        }
+        public String tailResponse(String responseText){
+                return responseText.substring(Math.max(0, responseText.length()-400),responseText.length());
         }
 }

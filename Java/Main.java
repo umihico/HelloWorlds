@@ -15,6 +15,5 @@ public class Main {
                 resultPrinter.printRealtimeStatus();
                 long requestedNum=futureRequestedNum.get();
                 resultPrinter.printSummary(requestedNum);
-                System.out.println("Main -fin-");
         }
 }

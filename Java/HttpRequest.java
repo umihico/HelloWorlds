@@ -38,6 +38,7 @@ public class HttpRequest implements Callable<HashMap<String,String> > {
                 RandomUrlGenerator rurl= new RandomUrlGenerator();// replace random poplar url not to attack one
                 url=new URL(rurl.genUrlRandomly()); // replace random poplar url not to attack one
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                // conn.setConnectTimeout(100000);
                 conn.setRequestMethod("GET");
                 // System.out.println("start request");
                 BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
