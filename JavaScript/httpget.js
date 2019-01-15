@@ -31,3 +31,9 @@ request.onreadystatechange = function () {
     }
 };
 request.send(null);
+
+
+var price=document.getElementById('priceof{href}').value;
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'http://localhost:5555/bid/?aucid={href}&price='+price, true);
+xhr.send();
