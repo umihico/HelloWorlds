@@ -1,0 +1,14 @@
+.logo-images {
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.wing {
+  width: 100px;
+  height: 100px;
+  background: url('ergodoxwing.png');
+  background-size:70% auto;
+  background-repeat: no-repeat;
+  background-position: 0% 0% 0% 100%
+}
