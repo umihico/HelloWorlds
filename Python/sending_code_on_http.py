@@ -35,3 +35,21 @@ print(type(foo))
 # Chrome.pickled_method = pickled_method
 # chrome = Chrome()
 # print(chrome.pickled_method())
+
+
+def test_sending_via_http():
+    funcname, byte_func = dump_code(method)
+    import pickle
+    print(type(byte_func))
+    pickled = pickle.dumps([funcname, byte_func])
+    print(type(pickled))
+    data = pickled
+    print(type(byte_func))
+    name2, func2 = pickle.loads(pickled)
+    print(name2, func2)
+
+    print(byte_func)
+    import urllib
+    req = urllib.request.Request('http://localhost/', data=data,  method="POST")
+    with urllib.request.urlopen(req, timeout=29) as res:
+        body = res.read()
