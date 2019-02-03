@@ -1,5 +1,5 @@
 from credentials import yahoo_password, yahoo_userid
-test_url = "https://page.auctions.yahoo.co.jp/jp/auction/u252230508"
+test_url = "https://page.auctions.yahoo.co.jp/jp/auction/e330219271"
 action = "https://auctions.yahoo.co.jp/jp/show/bid_preview"
 from lxml.html import fromstring
 from umihico.scraping.requests_ import get, _base_headers
@@ -8,32 +8,38 @@ from selenium.webdriver import Chrome, ChromeOptions
 Chrome.xpath = Chrome.find_element_by_xpath
 Chrome.xpaths = Chrome.find_elements_by_xpath
 from time import sleep
-
-s = Session()
-s.post(url, data=None, json=None)
+#
+# s = Session()
+# s.post(url, data=None, json=None)
 
 
 class AutoLxmlSession(Session):
-    def set_parser(self, response):
+    def set_parser(self, response, url):
         self.response = response
-        self.lxml = fromstring(self.response)
+        self.lxml = fromstring(self.response.text)
         self.last_url = url
         return response
 
     def get(self, url):
-        return self.set_parser(super().get(url))
+        return self.set_parser(super().get(url), url)
 
-    def post(url, data=None, json=None):
-        return self.set_parser(super().post(url, data=data, json=json))
+    def post(self, url, data=None, json=None):
+        response = super().post(url, data=data, json=json)
+        return self.set_parser(response, url)
 
 
 class FormEasyPostableSession(AutoLxmlSession):
-    def post_form(self, optional_dict, form_inputs_xpath):
-        default_inputs = self.lxml.xpath(form_xpath)
-        payload = {input_.attrib['name']: input_.attrib['value']
+    def post_form(self, optional_dict, form_xpath):
+        default_inputs = self.lxml.xpath(form_xpath + "//input")
+        default_inputs = [
+            inp for inp in default_inputs if 'name' in inp.attrib]
+        payload = {input_.attrib['name']: input_.attrib.get("value", "")
                    for input_ in default_inputs}
+        print(payload)
+        print(optional_dict)
         payload.update(optional_dict)
-        return self.set_parser(self.post(self.last_url, data=payload))
+        print(payload)
+        return self.set_parser(self.post(self.last_url, data=payload), self.last_url)
 
 
 def gen_headless_options():
@@ -66,6 +72,7 @@ def gen_logined_session2(username, password):
     session = FormEasyPostableSession()
     for cookie in cookies:
         session.cookies.set(cookie['name'], cookie['value'])
+    chrome.quit()
     return session
 
 
@@ -105,7 +112,6 @@ def gen_cookie_copied_chrome(cookies):
 
 
 def gen_logined_session(username=None, password=None):
-
     session = Session()
     session.headers = _base_headers.copy()
     response = session.get("https://login.yahoo.co.jp/")
@@ -154,7 +160,7 @@ class SessionFormSender():
         self.lxml = fromstring(self.response.text)
         return self.response
 
-    def form_post(self, optional_input_dict):
+    def form_post(self, optional_input_dict,):
         self.response = self.session.post(data=optional_input_dict)
         self.lxml = fromstring(self.response.text)
         return self.response
@@ -167,14 +173,13 @@ def test_bid2():
     global test_url
     session = gen_logined_session2(yahoo_userid, yahoo_password)
     session.get(test_url)
-    session.post_form(
-        dict, "//form[@action='https://auctions.yahoo.co.jp/jp/show/bid_preview']")
-    # text_content()
-    inputs = lxml.xpath(
-        "//form[@method='post' and @action='https://auctions.yahoo.co.jp/jp/show/bid_preview']//input")
-    for input_ in inputs:
-        print(input_.attrib)
-        print(input_.attrib['name'], input_.attrib['value'])
+    optional_dict = {"lastquantity": "1",
+                     "setPrice": "100",
+                     "Quantity": "1", }
+    response = session.post_form(
+        optional_dict, "//form[@action='https://auctions.yahoo.co.jp/jp/show/bid_preview']")
+    lxml = fromstring(response.text)
+    print(lxml.xpath("//html")[0].text_content())
 
 
 test_bid2()
@@ -196,7 +201,7 @@ def test_bid():
         "cc": "jp",
         "bidType": "1000",
         "lastquantity": "1",
-        "setPrice": "1500",
+        "setPrice": "100",
         "Quantity": "1",
         "Bid": "確認する",
     }
